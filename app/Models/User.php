@@ -22,6 +22,18 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_role',
+        'profile_location',
+        'profile_bio',
+        'profile_avatar',
+        'profile_status',
+        'devsell_active',
+        'devsell_joined_at',
+        'devsell_display_name',
+        'devsell_store_name',
+        'devsell_specialty',
+        'devsell_portfolio',
+        'devsell_bio',
     ];
 
     /**
@@ -44,6 +56,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'profile_status' => 'string',
+            'devsell_active' => 'boolean',
+            'devsell_joined_at' => 'datetime',
         ];
     }
 }
