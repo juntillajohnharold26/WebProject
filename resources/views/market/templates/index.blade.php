@@ -3,7 +3,7 @@
         <div class="col">
             <div class="card h-100 shadow-sm overflow-hidden" style="border-radius: 18px; border: 1px solid rgba(0,0,0,0.08);">
                 <a href="{{ route('templates.show', $listing) }}" class="text-decoration-none">
-                    <img src="{{ $listing->preview_images[0] ?? 'https://via.placeholder.com/400x300?text=' . urlencode($listing->title) }}" 
+                    <img src="{{ ! empty($listing->preview_images) ? Storage::url($listing->preview_images[0]) : 'https://via.placeholder.com/400x300?text=' . urlencode($listing->title) }}" 
                          class="card-img-top" alt="{{ $listing->title }}" style="height: 220px; object-fit: cover;">
                 </a>
                 <div class="card-body p-4">
@@ -15,11 +15,15 @@
                     </div>
                     <h6 class="fw-bold mb-2">{{ Str::limit($listing->title, 50) }}</h6>
                     <p class="text-muted small mb-2">{{ Str::limit($listing->description, 80) }}</p>
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center mb-3">
                         <img src="{{ $listing->user->profile_avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($listing->user->name) }}" 
                              class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;" alt="{{ $listing->user->name }}">
                         <span class="ms-2 small text-muted">{{ $listing->user->devsell_display_name ?? $listing->user->name }}</span>
                     </div>
+                    <form method="POST" action="{{ route('cart.add', $listing) }}">
+                        @csrf
+                        <button type="submit" class="btn btn-dark btn-sm w-100" style="border-radius: 8px;">Add to Cart</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -32,4 +36,3 @@
 </div>
 
 {{ $listings->appends(request()->query())->links() }}
-

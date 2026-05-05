@@ -1,13 +1,14 @@
 @php
     $categories = ['UI Kit', 'Dashboard', 'Landing', 'E-commerce', 'Mobile', 'Components', 'Icon Pack'];
-    $statuses = ['draft' => 'Draft', 'active' => 'Active', 'archived' => 'Archived'];
+    $statuses = ['draft' => 'Save as Draft', 'active' => 'Submit for Review', 'archived' => 'Archive'];
+
 @endphp
 
 <x-menu>
     <x-sidebar>
         <section class="create-template-page py-4">
             <div class="create-template__inner mx-auto">
-                <a href="{{ route('seller.templates.index') }}" class="btn btn-outline-dark btn-sm mb-4">&larr; Back to Dashboard</a>
+                <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-4">&larr; Back</a>
                 <h1 class="h2 fw-bold mb-4">Create New Template</h1>
 
                 @if ($errors->any())
@@ -65,7 +66,7 @@
                                     </div>
 
                                     <div class="mt-5 pt-4 border-top">
-                                        <label class="form-label fw-semibold mb-2">Status</label>
+                                        <label class="form-label fw-semibold mb-2">Publishing Status</label>
                                         <div class="row g-3">
                                             @foreach($statuses as $value => $label)
                                                 <div class="col-auto">
@@ -78,7 +79,11 @@
                                                 </div>
                                             @endforeach
                                         </div>
+                                        <div class="alert alert-info rounded-3 mt-3 mb-0 small">
+                                            <strong>Note:</strong> Selecting "Submit for Review" will send your template to our admin team for approval before it appears on the marketplace.
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -162,4 +167,3 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-

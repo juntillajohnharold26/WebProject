@@ -1,9 +1,11 @@
 @php
     $statusBadges = [
         'active' => 'bg-success',
+        'pending' => 'bg-info text-dark',
         'draft' => 'bg-warning text-dark',
         'archived' => 'bg-secondary',
     ];
+
 @endphp
 
 <x-menu>
@@ -12,7 +14,7 @@
             <div class="templates-page__inner mx-auto">
                 <div class="d-flex justify-content-between align-items-center mb-5">
                     <div>
-                        <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm mb-3">&larr; Explore</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-3">&larr; Back</a>
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <span class="small text-muted">Seller dashboard</span>
                         </div>

@@ -4,7 +4,7 @@
             <div class="seller-page__inner mx-auto">
                 <div class="seller-page__hero mb-4">
                     <div class="seller-page__hero-copy">
-                        <a href="{{ url('/contact') }}" class="btn btn-outline-dark btn-sm mb-3">&larr; Back</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-3">&larr; Back</a>
                         <h1 class="seller-page__title">Unlock DevSell access with your account credentials.</h1>
                         <p class="seller-page__lead mb-0">Use your DevBuy email and password, then finish your seller details to start sharing templates, UI kits, and premium digital assets.</p>
                     </div>

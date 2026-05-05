@@ -4,7 +4,7 @@
             <div class="container-fluid px-4">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <a href="{{ url('/inbox') }}" class="btn btn-outline-dark btn-sm">← Back to Inbox</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
                     </div>
                 </div>
 

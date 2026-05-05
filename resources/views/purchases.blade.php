@@ -4,7 +4,7 @@
             <div class="container-fluid px-4">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm">← Back</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
                     </div>
                 </div>
                 <div class="row align-items-center mb-4">
@@ -17,50 +17,44 @@
                     </div>
                 </div>
 
-            <div class="row g-4">
-                <div class="col-lg-6">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <div>
-                                    <h5 class="card-title mb-1">Premium UI Kit</h5>
-                                    <p class="text-muted small mb-0">E-commerce template set for modern storefronts.</p>
-                                </div>
-                                <span class="badge bg-success">Completed</span>
-                            </div>
-                            <div class="row g-3 text-muted small">
-                                <div class="col-6">Purchased</div>
-                                <div class="col-6 text-end">Apr 12, 2026</div>
-                                <div class="col-6">Amount</div>
-                                <div class="col-6 text-end">$49</div>
-                                <div class="col-6">License</div>
-                                <div class="col-6 text-end">Commercial</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                @if(session('success'))
+                    <div class="alert alert-success rounded-4 border-0 shadow-sm mb-4">{{ session('success') }}</div>
+                @endif
 
-                <div class="col-lg-6">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <div>
-                                    <h5 class="card-title mb-1">Design System Support</h5>
-                                    <p class="text-muted small mb-0">Monthly maintenance package for your UI library.</p>
+            <div class="row g-4">
+                @forelse($purchases as $purchase)
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div>
+                                        <h5 class="card-title mb-1">{{ $purchase['title'] }}</h5>
+                                        <p class="text-muted small mb-0">{{ $purchase['category'] }} by {{ $purchase['seller'] }}</p>
+                                    </div>
+                                    <span class="badge bg-success">{{ $purchase['status'] }}</span>
                                 </div>
-                                <span class="badge bg-warning text-dark">Active</span>
-                            </div>
-                            <div class="row g-3 text-muted small">
-                                <div class="col-6">Started</div>
-                                <div class="col-6 text-end">Mar 28, 2026</div>
-                                <div class="col-6">Next renewal</div>
-                                <div class="col-6 text-end">May 28, 2026</div>
-                                <div class="col-6">Amount</div>
-                                <div class="col-6 text-end">$120 / month</div>
+                                <div class="row g-3 text-muted small">
+                                    <div class="col-6">Purchased</div>
+                                    <div class="col-6 text-end">{{ \Carbon\Carbon::parse($purchase['purchased_at'])->format('M j, Y') }}</div>
+                                    <div class="col-6">Quantity</div>
+                                    <div class="col-6 text-end">{{ $purchase['quantity'] }}</div>
+                                    <div class="col-6">Amount</div>
+                                    <div class="col-6 text-end">${{ number_format($purchase['total'], 2) }}</div>
+                                    <div class="col-6">License</div>
+                                    <div class="col-6 text-end">Commercial</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                @empty
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm text-center p-5">
+                            <h5 class="fw-bold mb-2">No purchases yet</h5>
+                            <p class="text-muted mb-4">Buy a template and it will show here with a matching notification and inbox message.</p>
+                            <a href="{{ url('/explore') }}" class="btn btn-dark px-4">Browse Templates</a>
+                        </div>
+                    </div>
+                @endforelse
             </div>
 
             <div class="row g-4 mt-2">
@@ -86,30 +80,25 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Landing page bundle</td>
-                                            <td><span class="badge bg-success">Delivered</span></td>
-                                            <td>Apr 3, 2026</td>
-                                            <td class="text-end">$79</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Mobile app mockups</td>
-                                            <td><span class="badge bg-secondary">Pending</span></td>
-                                            <td>Apr 18, 2026</td>
-                                            <td class="text-end">$59</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Icon pack license</td>
-                                            <td><span class="badge bg-success">Delivered</span></td>
-                                            <td>Mar 30, 2026</td>
-                                            <td class="text-end">$15</td>
-                                        </tr>
+                                        @forelse($purchases as $purchase)
+                                            <tr>
+                                                <td>{{ $purchase['title'] }}</td>
+                                                <td><span class="badge bg-success">Delivered</span></td>
+                                                <td>{{ \Carbon\Carbon::parse($purchase['purchased_at'])->format('M j, Y') }}</td>
+                                                <td class="text-end">${{ number_format($purchase['total'], 2) }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-4">No transactions yet.</td>
+                                            </tr>
+                                        @endforelse
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </section>
     </x-sidebar>

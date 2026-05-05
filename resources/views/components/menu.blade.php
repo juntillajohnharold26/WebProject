@@ -79,16 +79,42 @@
     </style>
 </head>
 <body>
+    @php
+        $isAdminArea = request()->is('admin*');
+    @endphp
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
         <div class="container-fluid">
-            <span class="navbar-brand fw-bold">DevBuy</span>
-            <form class="d-flex mx-auto flex-grow-1" style="max-width: 500px;">
-                <input class="form-control form-control-sm me-2" type="search" placeholder="Search templates, designs..." aria-label="Search">
+            <a href="{{ $isAdminArea ? url('/admin') : url('/explore') }}" class="navbar-brand fw-bold text-decoration-none">
+                {{ $isAdminArea ? 'DevBuy Admin' : 'DevBuy' }}
+            </a>
+            @unless($isAdminArea)
+            <form method="GET" action="{{ url('/search') }}" class="d-flex mx-auto flex-grow-1" style="max-width: 500px;">
+                <input class="form-control form-control-sm me-2 text-white" type="search" name="q" value="{{ request('q') }}" placeholder="Search templates, designs..." aria-label="Search">
                 <button class="btn btn-outline-light btn-sm" type="submit" title="Search">🔍</button>
             </form>
+            @else
+                <div class="mx-auto text-light small fw-semibold">Template Review Console</div>
+            @endunless
             <div class="d-flex gap-2 align-items-center">
+                @unless($isAdminArea)
+                @php
+                    $navNotifications = session('notifications', []);
+                    $navMessages = session('messages', []);
+                @endphp
                 <button class="btn btn-outline-light btn-sm" title="Notifications" data-bs-toggle="modal" data-bs-target="#notificationsModal">🔔</button>
                 <a href="{{ url('/inbox') }}" class="btn btn-outline-light btn-sm" title="Inbox">✉️</a>
+                <a href="{{ url('/cart') }}" class="btn btn-outline-light btn-sm position-relative" title="Cart">
+                    🛒
+                    @php
+                        $navCartCount = count(session('cart', []));
+                    @endphp
+                    @if($navCartCount > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+                            {{ $navCartCount }}
+                        </span>
+                    @endif
+                </a>
+                @endunless
                 <div class="dropdown">
                     @php
                         $menuUser = session('user_id') ? \App\Models\User::find(session('user_id')) : null;
@@ -98,9 +124,17 @@
                         <img src="{{ $avatarUrl }}" alt="Profile avatar" class="rounded-circle" width="32" height="32" style="object-fit:cover; border:1px solid rgba(255,255,255,0.4);" />
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileMenuButton">
+                        @unless($isAdminArea)
                         <li><a class="dropdown-item text-white" href="{{ url('/account') }}">Account</a></li>
+                        @endunless
+                        @if($menuUser && $menuUser->is_admin && ! $isAdminArea)
+                            <li><a class="dropdown-item text-warning" href="{{ url('/admin') }}">Admin Dashboard</a></li>
+                        @endif
+                        @unless($isAdminArea)
                         <li><a class="dropdown-item text-white" href="#">Switch Account</a></li>
+
                         <li><a class="dropdown-item text-white" href="#">Settings</a></li>
+                        @endunless
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logoutMenuForm').submit();">Logout</a></li>
                     </ul>
@@ -113,6 +147,7 @@
         @csrf
     </form>
 
+    @unless($isAdminArea)
     <div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content rounded-4 shadow-lg">
@@ -122,33 +157,21 @@
                 </div>
                 <div class="modal-body">
                     <div class="list-group mb-3">
-                        <a href="{{ url('/messages/1') }}" class="list-group-item list-group-item-action rounded-4 mb-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h6 class="mb-1">Order confirmed</h6>
-                                    <p class="mb-1 text-muted small">Your order for the E-commerce UI Kit has been confirmed.</p>
+                        @forelse(session('messages', []) as $message)
+                            <a href="{{ url('/messages/' . $message['id']) }}" class="list-group-item list-group-item-action rounded-4 mb-3">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ $message['subject'] }}</h6>
+                                        <p class="mb-1 text-muted small">{{ $message['preview'] ?? $message['body'] }}</p>
+                                    </div>
+                                    <small class="text-muted">{{ $message['time'] ?? 'Just now' }}</small>
                                 </div>
-                                <small class="text-muted">10 minutes ago</small>
+                            </a>
+                        @empty
+                            <div class="list-group-item rounded-4 text-center py-4">
+                                <p class="text-muted small mb-0">Purchase notifications will appear here.</p>
                             </div>
-                        </a>
-                        <a href="{{ url('/messages/2') }}" class="list-group-item list-group-item-action rounded-4 mb-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h6 class="mb-1">Billing update</h6>
-                                    <p class="mb-1 text-muted small">Your payment method was successfully updated.</p>
-                                </div>
-                                <small class="text-muted">Yesterday</small>
-                            </div>
-                        </a>
-                        <a href="{{ url('/messages/3') }}" class="list-group-item list-group-item-action rounded-4">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h6 class="mb-1">New feature</h6>
-                                    <p class="mb-1 text-muted small">We added new dashboard templates to the Explore page.</p>
-                                </div>
-                                <small class="text-muted">2 days ago</small>
-                            </div>
-                        </a>
+                        @endforelse
                     </div>
                 </div>
                 <div class="modal-footer border-0">
@@ -157,6 +180,7 @@
             </div>
         </div>
     </div>
+    @endunless
 
     <div>
         {{ $slot }}

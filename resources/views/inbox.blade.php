@@ -4,7 +4,7 @@
             <div class="container-fluid px-4">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm">← Back</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
                     </div>
                 </div>
 
@@ -16,35 +16,22 @@
                 </div>
 
                 <div class="list-group">
-                    <a href="{{ url('/messages/1') }}" class="list-group-item list-group-item-action rounded-4 shadow-sm mb-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1">DevSell Team</h5>
-                                <p class="mb-1 text-muted small">Your store listing has been approved and is now live.</p>
+                    @forelse($messages as $message)
+                        <a href="{{ url('/messages/' . $message['id']) }}" class="list-group-item list-group-item-action rounded-4 shadow-sm mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="mb-1">{{ $message['sender'] }}</h5>
+                                    <p class="mb-1 text-muted small">{{ $message['preview'] ?? $message['subject'] }}</p>
+                                </div>
+                                <small class="text-muted">{{ $message['time'] ?? 'Just now' }}</small>
                             </div>
-                            <small class="text-muted">1h ago</small>
+                        </a>
+                    @empty
+                        <div class="list-group-item rounded-4 shadow-sm text-center py-5">
+                            <h5 class="fw-bold mb-2">No messages yet</h5>
+                            <p class="text-muted mb-0">Purchase confirmations and order messages will show up here.</p>
                         </div>
-                    </a>
-
-                    <a href="{{ url('/messages/2') }}" class="list-group-item list-group-item-action rounded-4 shadow-sm mb-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1">Support</h5>
-                                <p class="mb-1 text-muted small">Your request has been received and is being reviewed.</p>
-                            </div>
-                            <small class="text-muted">Yesterday</small>
-                        </div>
-                    </a>
-
-                    <a href="{{ url('/messages/3') }}" class="list-group-item list-group-item-action rounded-4 shadow-sm">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1">DevBuy Team</h5>
-                                <p class="mb-1 text-muted small">Weekly digest: new templates and trending UI kits.</p>
-                            </div>
-                            <small class="text-muted">2 days ago</small>
-                        </div>
-                    </a>
+                    @endforelse
                 </div>
             </div>
         </section>

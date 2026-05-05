@@ -34,6 +34,7 @@ class User extends Authenticatable
         'devsell_specialty',
         'devsell_portfolio',
         'devsell_bio',
+        'is_admin',
     ];
 
     /**
@@ -59,6 +60,7 @@ class User extends Authenticatable
             'profile_status' => 'string',
             'devsell_active' => 'boolean',
             'devsell_joined_at' => 'datetime',
+            'is_admin' => 'boolean',
         ];
     }
 }

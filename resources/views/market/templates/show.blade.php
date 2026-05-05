@@ -1,7 +1,7 @@
 <x-menu>
     <x-sidebar>
         <div class="container-fluid px-4 py-4">
-            <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm mb-4">&larr; Back to Explore</a>
+            <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-4">&larr; Back</a>
 
             <div class="row g-5">
                 <!-- Main Content -->
@@ -21,7 +21,7 @@
                             <div class="carousel-inner">
                                 @foreach($listing->preview_images as $index => $image)
                                 <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                    <img src="{{ $image }}" class="d-block w-100" style="height: 500px; object-fit: cover;" alt="{{ $listing->title }} preview {{ $index + 1 }}">
+                                    <img src="{{ Storage::url($image) }}" class="d-block w-100" style="height: 500px; object-fit: cover;" alt="{{ $listing->title }} preview {{ $index + 1 }}">
                                 </div>
                                 @endforeach
                             </div>
@@ -73,13 +73,16 @@
                             </div>
                         </div>
                         <div class="mb-4">
-                            <a href="{{ url('/purchases') }}" class="btn btn-dark w-100 mb-3 fw-bold fs-5 py-3" style="border-radius: 12px;">
-                                Buy Now - ${{ number_format($listing->price, 2) }}
-                            </a>
-                            <div class="text-center">
-                                <a href="#" class="text-decoration-none small text-muted me-2">❤️ Add to favorites</a>
-                                <a href="#" class="text-decoration-none small text-muted">📤 Share</a>
-                            </div>
+                            <form method="POST" action="{{ route('templates.buy', $listing) }}" class="mb-3">
+                                @csrf
+                                <button type="submit" class="btn btn-dark w-100 fw-bold fs-5 py-3" style="border-radius: 12px;">
+                                    Buy Now - ${{ number_format($listing->price, 2) }}
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ route('cart.add', $listing) }}">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-dark w-100 fw-bold py-3" style="border-radius: 12px;">Add to Cart</button>
+                            </form>
                         </div>
                         <hr>
                         <h6 class="fw-bold mb-3">Template Details</h6>
@@ -121,4 +124,3 @@
         box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
 </style>
-

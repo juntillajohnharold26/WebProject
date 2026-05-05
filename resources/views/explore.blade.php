@@ -12,7 +12,6 @@
                             <a href="#featured" class="btn btn-outline-dark btn-sm px-4">Featured Designs</a>
                         </div>
                     </div>
-
                     <div class="col-lg-7">
                         <div id="devbuyCarousel" class="carousel slide rounded-4 overflow-hidden shadow"
                             data-bs-ride="carousel" data-bs-interval="3000" data-bs-pause="false">
@@ -58,7 +57,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -69,6 +67,7 @@
             </div>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-4">
                 <div class="col">
+                    <a href="{{ url('/search?tag=futuristic') }}" class="text-decoration-none d-block h-100">
                     <div class="card h-100 border-0 shadow-sm overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=640&q=80"
                             class="card-img-top style-img" alt="Futuristic style">
@@ -76,8 +75,10 @@
                             <h5 class="card-title mb-0">Futuristic</h5>
                         </div>
                     </div>
+                    </a>
                 </div>
                 <div class="col">
+                    <a href="{{ url('/search?tag=minimal') }}" class="text-decoration-none d-block h-100">
                     <div class="card h-100 border-0 shadow-sm overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=640&q=80"
                             class="card-img-top style-img" alt="Minimal style">
@@ -85,8 +86,10 @@
                             <h5 class="card-title mb-0">Minimal</h5>
                         </div>
                     </div>
+                    </a>
                 </div>
                 <div class="col">
+                    <a href="{{ url('/search?tag=dark') }}" class="text-decoration-none d-block h-100">
                     <div class="card h-100 border-0 shadow-sm overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=640&q=80"
                             class="card-img-top style-img" alt="Dark style">
@@ -94,8 +97,10 @@
                             <h5 class="card-title mb-0">Dark</h5>
                         </div>
                     </div>
+                    </a>
                 </div>
                 <div class="col">
+                    <a href="{{ url('/search?tag=creative') }}" class="text-decoration-none d-block h-100">
                     <div class="card h-100 border-0 shadow-sm overflow-hidden">
                         <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=640&q=80"
                             class="card-img-top style-img" alt="Creative style">
@@ -103,6 +108,7 @@
                             <h5 class="card-title mb-0">Creative</h5>
                         </div>
                     </div>
+                    </a>
                 </div>
             </div>
         </section>
@@ -124,9 +130,8 @@
                         </div>
                         <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
                             <span class="fw-semibold">Ready to launch</span>
-                            <button class="btn btn-sm"
-                                style="background-color: #000000; border-color: #000000; color: white;">Add to
-                                Cart</button>
+                            <a href="{{ url('/search') }}" class="btn btn-sm"
+                                style="background-color: #000000; border-color: #000000; color: white;">Browse</a>
                         </div>
                     </div>
                 </div>
@@ -140,9 +145,8 @@
                         </div>
                         <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
                             <span class="fw-semibold">Flexible use</span>
-                            <button class="btn btn-sm"
-                                style="background-color: #000000; border-color: #000000; color: white;">Add to
-                                Cart</button>
+                            <a href="{{ url('/search') }}" class="btn btn-sm"
+                                style="background-color: #000000; border-color: #000000; color: white;">Browse</a>
                         </div>
                     </div>
                 </div>
@@ -157,9 +161,8 @@
                         </div>
                         <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center">
                             <span class="fw-semibold">Shop-ready</span>
-                            <button class="btn btn-sm"
-                                style="background-color: #000000; border-color: #000000; color: white;">Add to
-                                Cart</button>
+                            <a href="{{ url('/search') }}" class="btn btn-sm"
+                                style="background-color: #000000; border-color: #000000; color: white;">Browse</a>
                         </div>
                     </div>
                 </div>

@@ -1,6 +1,8 @@
 @php
     $categories = ['UI Kit', 'Dashboard', 'Landing', 'E-commerce', 'Mobile', 'Components', 'Icon Pack'];
-    $statuses = ['draft' => 'Draft', 'active' => 'Active', 'archived' => 'Archived'];
+    $statuses = ['draft' => 'Save as Draft', 'active' => 'Submit for Review', 'archived' => 'Archive'];
+    $isPending = $template->status === 'pending';
+
 @endphp
 
 <x-menu>
@@ -9,7 +11,7 @@
             <div class="edit-template__inner mx-auto">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <a href="{{ route('seller.templates.index') }}" class="btn btn-outline-dark btn-sm mb-2">&larr; Dashboard</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-2">&larr; Back</a>
                         <h1 class="h3 fw-bold mb-0">Edit Template</h1>
                     </div>
                 </div>
@@ -64,18 +66,27 @@
                                     </div>
 
                                     <div class="border-top pt-4">
-                                        <label class="form-label fw-semibold mb-3">Status</label>
+                                        <label class="form-label fw-semibold mb-3">Publishing Status</label>
+                                        @if($isPending)
+                                            <div class="alert alert-warning rounded-3 mb-3 small">
+                                                This template is currently <strong>under review</strong>. You can withdraw it to draft to make changes, or leave it as-is.
+                                            </div>
+                                        @endif
                                         <div class="row g-3">
                                             @foreach($statuses as $value => $label)
                                                 <div class="col-auto">
                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="radio" name="status" id="status_{{ $value }}" value="{{ $value }}" {{ old('status', $template->status) == $value ? 'checked' : '' }}>
+                                                        <input class="form-check-input" type="radio" name="status" id="status_{{ $value }}" value="{{ $value }}" {{ old('status', $isPending ? 'active' : $template->status) == $value ? 'checked' : '' }}>
                                                         <label class="form-check-label" for="status_{{ $value }}">{{ $label }}</label>
                                                     </div>
                                                 </div>
                                             @endforeach
                                         </div>
+                                        <div class="alert alert-info rounded-3 mt-3 mb-0 small">
+                                            <strong>Note:</strong> Selecting "Submit for Review" will send your template to our admin team for approval before it appears on the marketplace.
+                                        </div>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
@@ -141,4 +152,3 @@
     border-radius: 1.5rem;
 }
 </style>
-

@@ -4,7 +4,7 @@
             <div class="container-fluid px-4">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm">← Back</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
                     </div>
                 </div>
 
@@ -16,38 +16,23 @@
                 </div>
 
                 <div class="list-group">
-                    <div class="list-group-item rounded-4 shadow-sm mb-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1">Order confirmed</h5>
-                                <p class="mb-1 text-muted small">Your order for the E-commerce UI Kit has been confirmed.</p>
+                    @forelse($notifications as $notification)
+                        <div class="list-group-item rounded-4 shadow-sm mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h5 class="mb-1">{{ $notification['title'] }}</h5>
+                                    <p class="mb-1 text-muted small">{{ $notification['body'] }}</p>
+                                </div>
+                                <span class="badge {{ $notification['badge_class'] ?? 'bg-primary' }}">{{ $notification['badge'] ?? 'Update' }}</span>
                             </div>
-                            <span class="badge bg-success">New</span>
+                            <small class="text-muted">{{ $notification['time'] ?? 'Just now' }}</small>
                         </div>
-                        <small class="text-muted">10 minutes ago</small>
-                    </div>
-
-                    <div class="list-group-item rounded-4 shadow-sm mb-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1">Billing update</h5>
-                                <p class="mb-1 text-muted small">Your payment method was successfully updated.</p>
-                            </div>
-                            <span class="badge bg-secondary">Info</span>
+                    @empty
+                        <div class="list-group-item rounded-4 shadow-sm text-center py-5">
+                            <h5 class="fw-bold mb-2">No notifications yet</h5>
+                            <p class="text-muted mb-0">When you purchase a template, your order update will appear here.</p>
                         </div>
-                        <small class="text-muted">Yesterday</small>
-                    </div>
-
-                    <div class="list-group-item rounded-4 shadow-sm">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h5 class="mb-1">New feature</h5>
-                                <p class="mb-1 text-muted small">We added new dashboard templates to the Explore page.</p>
-                            </div>
-                            <span class="badge bg-primary">Update</span>
-                        </div>
-                        <small class="text-muted">2 days ago</small>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </section>

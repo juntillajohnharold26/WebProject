@@ -26,7 +26,7 @@
                 <div class="account-page__hero bg-white rounded-4 shadow-sm p-4 p-lg-5 mb-4">
                     <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
                         <div>
-                            <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm mb-3">&larr; Back</a>
+                            <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-3">&larr; Back</a>
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <span class="small text-muted">Manage your public profile</span>
                             </div>

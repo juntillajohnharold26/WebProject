@@ -62,18 +62,26 @@ class TemplateController extends Controller
         $data['tags'] = !empty($data['tags']) ? array_map('trim', explode(',', $data['tags'])) : [];
 
         // Create user dir
-        $userDir = 'public/templates/' . $userId;
+        $userDir = 'templates/' . $userId;
         $slug = Str::slug($data['title'] . '-' . time());
         $zipPath = $userDir . '/' . $slug . '.zip';
         Storage::disk('public')->makeDirectory($userDir);
-        $request->file('zip')->storeAs($userDir, $slug . '.zip');
+        $request->file('zip')->storeAs($userDir, $slug . '.zip', 'public');
 
         $previewPaths = [];
         if ($request->hasFile('preview_images')) {
             foreach ($request->file('preview_images') as $image) {
-                $previewName = Str::random(20) . '.webp';
-                $previewPaths[] = $image->storeAs($userDir . '/previews', $previewName);
+                $previewName = Str::random(20) . '.' . $image->getClientOriginalExtension();
+                $previewPaths[] = $image->storeAs($userDir . '/previews', $previewName, 'public');
             }
+        }
+
+        $status = $data['status'] ?? 'draft';
+        $wasSubmittedForReview = false;
+
+        if ($status === 'active') {
+            $status = 'pending';
+            $wasSubmittedForReview = true;
         }
 
         TemplateListing::create([
@@ -85,10 +93,15 @@ class TemplateController extends Controller
             'price' => $data['price'],
             'zip_path' => $zipPath,
             'preview_images' => $previewPaths,
-            'status' => $data['status'] ?? 'draft',
+            'status' => $status,
         ]);
 
-        return redirect()->route('seller.templates.index')->with('success', 'Template created.');
+        $message = $wasSubmittedForReview
+            ? 'Template created and submitted for review. It will appear in the marketplace after admin approval.'
+            : 'Template created.';
+
+        return redirect()->route('seller.templates.index')->with('success', $message);
+
     }
 
     public function edit(TemplateListing $template)
@@ -129,15 +142,23 @@ class TemplateController extends Controller
             Storage::disk('public')->delete($template->zip_path);
             $template->zip_path = null;
         } elseif ($request->hasFile('zip')) {
-            $userDir = dirname(Storage::disk('public')->path($template->zip_path));
+            $userDir = $template->zip_path ? dirname($template->zip_path) : 'templates/' . $userId;
             $slug = Str::slug($data['title'] . '-' . time());
             $newZip = $userDir . '/' . $slug . '.zip';
-            $request->file('zip')->storeAs($userDir, $slug . '.zip');
+            $request->file('zip')->storeAs($userDir, $slug . '.zip', 'public');
             Storage::disk('public')->delete($template->zip_path);
             $template->zip_path = $newZip;
         }
 
         // Previews similar logic (omitted for brevity, add if needed)
+
+        $status = $data['status'];
+        $wasSubmittedForReview = false;
+
+        if ($status === 'active') {
+            $status = 'pending';
+            $wasSubmittedForReview = true;
+        }
 
         $template->update([
             'title' => $data['title'],
@@ -145,10 +166,15 @@ class TemplateController extends Controller
             'category' => $data['category'],
             'tags' => $data['tags'] ?? [],
             'price' => $data['price'],
-            'status' => $data['status'],
+            'status' => $status,
         ]);
 
-        return redirect()->route('seller.templates.index')->with('success', 'Template updated.');
+        $message = $wasSubmittedForReview
+            ? 'Template updated and submitted for review. It will appear in the marketplace after admin approval.'
+            : 'Template updated.';
+
+        return redirect()->route('seller.templates.index')->with('success', $message);
+
     }
 
     public function destroy(TemplateListing $template)
@@ -174,4 +200,3 @@ function authSeller($userId): bool
     $user = User::find($userId);
     return $user && $user->devsell_active;
 }
-

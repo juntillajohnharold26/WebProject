@@ -4,7 +4,7 @@
             <div class="container-fluid px-4">
                 <div class="row mb-5">
                     <div class="col-12">
-                        <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm">← Back</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
                     </div>
                 </div>
 
@@ -26,6 +26,9 @@
                                 @if(request('q'))
                                     for "{{ request('q') }}"
                                 @endif
+                                @if(request('tag'))
+                                    tagged "{{ request('tag') }}"
+                                @endif
                                 @if(request('category'))
                                     in {{ request('category') }}
                                 @endif
@@ -38,11 +41,20 @@
                             <div class="card h-100 border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 2rem;">
                                 <h5 class="fw-bold mb-4">Filters</h5>
                                 
-                                <!-- Search Form (sticky) -->
                                 <form method="GET" action="{{ url('/search') }}" class="mb-4">
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold small mb-2">Search</label>
                                         <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-sm" placeholder="Title, keyword...">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold small mb-2">Tag</label>
+                                        <select name="tag" class="form-select form-select-sm">
+                                            <option value="">All tags</option>
+                                            @foreach($tags as $tag)
+                                                <option value="{{ $tag }}" {{ request('tag') == $tag ? 'selected' : '' }}>{{ ucfirst($tag) }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     
                                     <div class="mb-3">
@@ -67,7 +79,7 @@
                                     </div>
                                     
                                     <button type="submit" class="btn btn-dark w-100 mt-3 fw-semibold py-2">Apply Filters</button>
-                                    @if(request()->hasAny(['q', 'category', 'min_price', 'max_price']))
+                                    @if(request()->hasAny(['q', 'tag', 'category', 'min_price', 'max_price']))
                                         <a href="{{ url('/search') }}" class="btn btn-outline-secondary w-100 mt-2 btn-sm">Clear All</a>
                                     @endif
                                 </form>

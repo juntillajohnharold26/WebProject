@@ -1,19 +1,35 @@
 <aside class="sidebar-panel d-none d-lg-block bg-dark text-light">
     <div class="sidebar-inner p-4">
+        @php
+            $cartCount = count(session('cart', []));
+        @endphp
+
+        <h6 class="text-muted text-uppercase mb-4">Market</h6>
+        <nav class="nav flex-column gap-2 mb-4">
+            <a href="{{ url('/explore') }}" class="nav-link text-light text-decoration-none small {{ request()->is('explore*') || request()->is('search*') || request()->is('/') ? 'bg-primary bg-opacity-25 border-start border-primary border-3' : '' }}">Dashboard</a>
+            <a href="{{ url('/cart') }}" class="nav-link text-light text-decoration-none small d-flex justify-content-between align-items-center {{ request()->is('cart') ? 'bg-primary bg-opacity-25 border-start border-primary border-3' : '' }}">
+                <span>Cart</span>
+                @if($cartCount > 0)
+                    <span class="badge bg-danger rounded-pill">{{ $cartCount }}</span>
+                @endif
+            </a>
+        </nav>
+
+        <hr class="border-secondary">
+
         <h6 class="text-muted text-uppercase mb-4">Account</h6>
         <nav class="nav flex-column gap-2 mb-4">
-            <a href="{{ url('/account') }}" class="nav-link text-light text-decoration-none small">Account Info</a>
-            <a href="{{ url('/seller/templates') }}" class="nav-link text-light text-decoration-none small {{ request()->is('seller/templates*') ? 'bg-primary bg-opacity-25 border-start border-primary border-3' : '' }}">Templates</a>
-            <a href="{{ url('/purchases') }}" class="nav-link text-light text-decoration-none small">Purchases</a>
-            <a href="{{ url('/favorites') }}" class="nav-link text-light text-decoration-none small">Favorites</a>
+            <a href="{{ url('/account') }}" class="nav-link text-light text-decoration-none small {{ request()->is('account*') ? 'bg-primary bg-opacity-25 border-start border-primary border-3' : '' }}">Account Info</a>
+            <a href="{{ url('/seller/templates') }}" class="nav-link text-light text-decoration-none small {{ request()->is('seller/templates*') ? 'bg-primary bg-opacity-25 border-start border-primary border-3' : '' }}">My Templates</a>
+            <a href="{{ url('/purchases') }}" class="nav-link text-light text-decoration-none small {{ request()->is('purchases*') ? 'bg-primary bg-opacity-25 border-start border-primary border-3' : '' }}">Purchases</a>
         </nav>
 
         <hr class="border-secondary">
 
         <h6 class="text-muted text-uppercase mb-4">Support</h6>
         <nav class="nav flex-column gap-2">
-            <a href="{{ url('/about') }}" class="nav-link text-light text-decoration-none small">Help Center</a>
-            <a href="{{ url('/contact') }}" class="nav-link text-light text-decoration-none small">Contact Us</a>
+            <a href="{{ url('/about') }}" class="nav-link text-light text-decoration-none small {{ request()->is('about*') ? 'bg-primary bg-opacity-25 border-start border-primary border-3' : '' }}">Help Center</a>
+            <a href="{{ url('/contact') }}" class="nav-link text-light text-decoration-none small {{ request()->is('contact*') ? 'bg-primary bg-opacity-25 border-start border-primary border-3' : '' }}">Contact Us</a>
         </nav>
     </div>
 </aside>
@@ -71,6 +87,9 @@
     .sidebar-panel h6 {
         transition: all 0.3s ease;
         padding-left: 1rem;
+        color: rgba(255, 255, 255, 0.78) !important;
+        font-weight: 700;
+        letter-spacing: 0;
     }
 
     .sidebar-panel h6:hover {

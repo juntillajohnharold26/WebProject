@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use App\Models\User;
 use App\Http\Controllers\BuyerController;
+use App\Http\Controllers\AdminController;
+use App\Http\Middleware\AdminMiddleware;
 
 $getCurrentUser = function (): ?User {
     $userId = session('user_id');
@@ -70,7 +72,7 @@ Route::post('/login', function (Request $request) {
 
     session(['authenticated' => true, 'user_id' => $user->id]);
 
-    return redirect('/explore');
+    return $user->is_admin ? redirect('/admin') : redirect('/explore');
 })->name('login.submit');
 
 Route::get('/signup', function () {
@@ -125,7 +127,9 @@ Route::get('/notifications', function (Request $request) {
         return redirect()->route('signup')->with('error', 'Please log in or sign up to view notifications.');
     }
 
-    return view('notifications');
+    return view('notifications', [
+        'notifications' => session('notifications', []),
+    ]);
 });
 
 Route::get('/inbox', function (Request $request) {
@@ -133,7 +137,9 @@ Route::get('/inbox', function (Request $request) {
         return redirect()->route('signup')->with('error', 'Please log in or sign up to view your inbox.');
     }
 
-    return view('inbox');
+    return view('inbox', [
+        'messages' => session('messages', []),
+    ]);
 });
 
 Route::get('/messages/{id}', function (Request $request, $id) {
@@ -141,22 +147,25 @@ Route::get('/messages/{id}', function (Request $request, $id) {
         return redirect()->route('signup')->with('error', 'Please log in or sign up to view this message.');
     }
 
-    $messages = [
+    $messages = collect(session('messages', []))->keyBy('id')->all() + [
         1 => [
             'sender' => 'DevSell Team',
             'subject' => 'Order confirmed',
+            'preview' => 'Your order for the E-commerce UI Kit has been confirmed.',
             'body' => 'Your order for the E-commerce UI Kit has been confirmed and is now being prepared for delivery. Check your inbox for the invoice and next steps.',
             'time' => '10 minutes ago',
         ],
         2 => [
             'sender' => 'Support',
             'subject' => 'Billing update',
+            'preview' => 'Your payment method was successfully updated.',
             'body' => 'Your payment method was successfully updated. No action is needed unless you want to choose a different card.',
             'time' => 'Yesterday',
         ],
         3 => [
             'sender' => 'DevBuy Team',
             'subject' => 'New feature',
+            'preview' => 'We added new dashboard templates to the Explore page.',
             'body' => 'We added new dashboard templates to the Explore page. Visit your inbox to see the new collections and start using them today.',
             'time' => '2 days ago',
         ],
@@ -278,16 +287,24 @@ Route::post('/account', function (Request $request) use ($getCurrentUser, $statu
     return redirect('/account')->with('success', 'Profile updated successfully.');
 });
 
-Route::get('/purchases', function () {
-    return view('purchases');
-});
-
-Route::get('/favorites', function () {
-    return view('favorites');
-});
+Route::get('/purchases', [BuyerController::class, 'purchases'])->name('purchases');
 
 Route::get('/templates/{listing}', [BuyerController::class, 'show'])->name('templates.show');
 
+// Cart routes
+Route::get('/cart', [BuyerController::class, 'cart'])->name('cart');
+Route::post('/cart/checkout', [BuyerController::class, 'checkout'])->name('cart.checkout');
+Route::post('/cart/add/{listing}', [BuyerController::class, 'addToCart'])->name('cart.add');
+Route::post('/cart/remove/{listing}', [BuyerController::class, 'removeFromCart'])->name('cart.remove');
+Route::post('/templates/{listing}/buy', [BuyerController::class, 'buyNow'])->name('templates.buy');
+
 Route::prefix('seller')->name('seller.')->group(function () {
     Route::resource('templates', \App\Http\Controllers\Seller\TemplateController::class)->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+});
+
+Route::prefix('admin')->name('admin.')->middleware(AdminMiddleware::class)->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('index');
+    Route::get('/templates/{listing}', [AdminController::class, 'show'])->name('templates.show');
+    Route::post('/templates/{listing}/approve', [AdminController::class, 'approve'])->name('templates.approve');
+    Route::post('/templates/{listing}/reject', [AdminController::class, 'reject'])->name('templates.reject');
 });
