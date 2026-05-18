@@ -4,7 +4,7 @@
             <div class="container-fluid px-4">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
+                        <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm" onclick="if (window.history.length > 1) { window.history.back(); return false; }">← Back</a>
                     </div>
                 </div>
 
@@ -17,15 +17,30 @@
 
                 <div class="list-group">
                     @forelse($messages as $message)
-                        <a href="{{ url('/messages/' . $message['id']) }}" class="list-group-item list-group-item-action rounded-4 shadow-sm mb-3">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h5 class="mb-1">{{ $message['sender'] }}</h5>
-                                    <p class="mb-1 text-muted small">{{ $message['preview'] ?? $message['subject'] }}</p>
-                                </div>
-                                <small class="text-muted">{{ $message['time'] ?? 'Just now' }}</small>
+                        @php $isRead = ! empty($message['read']); @endphp
+                        <div class="list-group-item rounded-4 shadow-sm mb-3 d-flex justify-content-between align-items-start">
+                            <div class="me-3 flex-grow-1">
+                                <a href="{{ url('/messages/' . $message['id']) }}" class="text-decoration-none text-dark">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="mb-1">{{ $message['sender'] }} @unless($isRead)<span class="badge bg-primary ms-2">New</span>@endunless</h5>
+                                            <p class="mb-1 text-muted small">{{ $message['preview'] ?? $message['subject'] }}</p>
+                                        </div>
+                                        <small class="text-muted">{{ $message['time'] ?? 'Just now' }}</small>
+                                    </div>
+                                </a>
                             </div>
-                        </a>
+                            <div class="d-flex flex-column gap-2 align-items-end">
+                                <form method="POST" action="{{ route('messages.toggle-read', $message['id']) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">{{ $isRead ? 'Mark Unread' : 'Mark Read' }}</button>
+                                </form>
+                                <form method="POST" action="{{ route('messages.delete', $message['id']) }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
                     @empty
                         <div class="list-group-item rounded-4 shadow-sm text-center py-5">
                             <h5 class="fw-bold mb-2">No messages yet</h5>

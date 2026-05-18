@@ -26,7 +26,7 @@
                 <div class="account-page__hero bg-white rounded-4 shadow-sm p-4 p-lg-5 mb-4">
                     <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
                         <div>
-                            <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-3">&larr; Back</a>
+                            <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm mb-3" onclick="if (window.history.length > 1) { window.history.back(); return false; }">&larr; Back</a>
                             <div class="d-flex align-items-center gap-2 mb-2">
                                 <span class="small text-muted">Manage your public profile</span>
                             </div>
@@ -44,6 +44,31 @@
                                         {{ $isSellerActive ? 'In DevSell' : 'Not in DevSell' }}
                                     </span>
                                 </div>
+
+                                @if ($isSellerActive)
+                                    <div class="seller-summary rounded-4 bg-white bg-opacity-10 p-3 mb-3">
+                                        <div class="d-flex flex-column flex-sm-row justify-content-between gap-3 align-items-start">
+                                            <div>
+                                                <p class="small text-uppercase text-muted mb-2">Seller account</p>
+                                                <h2 class="h5 fw-semibold mb-1">{{ $sellerAccess['store_name'] ?: $sellerAccess['display_name'] }}</h2>
+                                                <p class="small text-muted mb-0">{{ $sellerAccess['specialty'] ?: 'Manage your shop and listings' }}</p>
+                                                <p class="small text-muted mb-0">Joined {{ $sellerAccess['joined_at'] }}</p>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-2 mt-2 mt-sm-0">
+                                                <a href="{{ route('seller.templates.index') }}" class="btn btn-light btn-sm">Seller dashboard</a>
+                                                <a href="{{ route('devsell.join', ['edit' => 1]) }}" class="btn btn-outline-light btn-sm">Edit seller profile</a>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="seller-summary rounded-4 bg-white bg-opacity-10 p-3 mb-3">
+                                        <p class="small text-uppercase text-muted mb-2">Seller access</p>
+                                        <p class="mb-2">Join DevSell to manage your seller profile, list templates, and track your listings.</p>
+                                        <a href="{{ route('devsell.join') }}" class="btn btn-light btn-sm">Activate DevSell</a>
+                                    </div>
+                                @endif
+
                                 <p class="small mb-0 account-page__summary-copy">
                                     {{ $isSellerActive ? 'Your seller access is already enabled.' : 'Join DevSell to start selling your digital work.' }}
                                 </p>
@@ -74,6 +99,16 @@
                                             <span class="badge text-bg-dark">Verified</span>
                                         </div>
                                         <p class="mb-0">{{ old('email', $profile['email']) }}</p>
+                                    </div>
+
+                                    <div class="account-detail">
+                                        <span class="small text-uppercase text-muted d-block mb-2">Display Name</span>
+                                        <p class="mb-0">{{ old('name', $profile['name']) }}</p>
+                                    </div>
+
+                                    <div class="account-detail">
+                                        <span class="small text-uppercase text-muted d-block mb-2">Bio</span>
+                                        <p class="mb-0">{{ old('bio', $profile['bio']) ?: 'No bio yet' }}</p>
                                     </div>
 
                                     <div class="account-detail">
@@ -116,7 +151,7 @@
                                     </div>
                                 @endif
 
-                                <form action="{{ url('/account') }}" method="POST">
+                                <form action="{{ url('/account') }}" method="POST" enctype="multipart/form-data">
                                     @csrf
 
                                     <div class="account-status-picker mb-4">
@@ -130,7 +165,7 @@
                                                         name="status"
                                                         id="status_{{ $value }}"
                                                         value="{{ $value }}"
-                                                        {{ old('status', $profile['status']) === $value ? 'checked' : '' }}
+                                                        {{ old('status') === $value ? 'checked' : '' }}
                                                     >
                                                     <label class="account-status-picker__label" for="status_{{ $value }}">
                                                         <span class="account-status-picker__dot account-status-picker__dot--{{ $value }}"></span>
@@ -155,22 +190,23 @@
 
                                         <div class="col-md-6">
                                             <label class="form-label fw-medium" for="role">Role</label>
-                                            <input id="role" type="text" name="role" value="{{ old('role', $profile['role']) }}" class="form-control account-input" required>
+<input id="role" type="text" name="role" value="{{ old('role') }}" class="form-control account-input">
                                         </div>
 
                                         <div class="col-md-6">
                                             <label class="form-label fw-medium" for="location">Location</label>
-                                            <input id="location" type="text" name="location" value="{{ old('location', $profile['location']) }}" class="form-control account-input" required>
+<input id="location" type="text" name="location" value="{{ old('location') }}" class="form-control account-input">
                                         </div>
 
                                         <div class="col-12">
                                             <label class="form-label fw-medium" for="bio">Profile Bio</label>
-                                            <textarea id="bio" name="bio" class="form-control account-input" rows="4" required>{{ old('bio', $profile['bio']) }}</textarea>
+                                            <textarea id="bio" name="bio" class="form-control account-input" rows="4">{{ old('bio', $profile['bio']) }}</textarea>
                                         </div>
 
                                         <div class="col-12">
-                                            <label class="form-label fw-medium" for="avatar">Avatar URL</label>
-                                            <input id="avatar" type="url" name="avatar" value="{{ old('avatar', $profile['avatar']) }}" class="form-control account-input">
+                                            <label class="form-label fw-medium" for="avatar_file">Upload Avatar</label>
+                                            <input id="avatar_file" type="file" name="avatar_file" accept="image/*" class="form-control account-input">
+                                            <div class="form-text small text-muted">Optional. Upload an image to use as your profile photo. If left empty, the existing/default avatar will remain.</div>
                                         </div>
                                     </div>
 
@@ -239,6 +275,8 @@
         border-radius: 1rem;
         background-color: #f8fafc;
         border: 1px solid rgba(15, 23, 42, 0.08);
+        overflow-wrap: break-word;
+        word-break: break-word;
     }
 
     .account-input {

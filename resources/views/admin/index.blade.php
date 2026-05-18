@@ -65,6 +65,65 @@
                     @endforeach
                 </div>
 
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="h5 fw-bold mb-0">Pending DevSell Requests</h2>
+                    <span class="text-muted small">{{ $counts['pending_sellers'] ?? 0 }} seller request(s)</span>
+                </div>
+
+                @if($pendingSellers->count() > 0)
+                    <div class="row g-4 mb-5">
+                        @foreach($pendingSellers as $seller)
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 shadow-sm border-0">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <img src="{{ $seller->profile_avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($seller->name) }}" class="rounded-circle" style="width: 52px; height: 52px; object-fit: cover;" alt="{{ $seller->name }}">
+                                                <div>
+                                                    <h3 class="h6 fw-bold mb-1">{{ $seller->devsell_display_name ?? $seller->name }}</h3>
+                                                    <p class="small text-muted mb-0">{{ $seller->email }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-end">
+                                                @if(($seller->devsell_active ?? false) && !empty($seller->devsell_editing))
+                                                    <span class="badge bg-info text-dark">Editing in progress</span>
+                                                @else
+                                                    <span class="badge bg-warning text-dark">Waiting for approval</span>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        <p class="small text-muted mb-1"><strong>Store:</strong> {{ $seller->devsell_store_name }}</p>
+                                        <p class="small text-muted mb-1"><strong>Specialty:</strong> {{ $seller->devsell_specialty }}</p>
+                                        <p class="small text-muted">{{ Str::limit($seller->devsell_bio, 110) }}</p>
+
+                                        <div class="d-grid gap-2 d-md-flex pt-3 border-top">
+                                            @if (($seller->devsell_active ?? false) && !empty($seller->devsell_editing))
+                                                <form method="POST" action="{{ route('admin.devsell.approve', $seller) }}" class="flex-fill">
+                                                    @csrf
+                                                    <button type="submit" name="clear_editing" value="1" class="btn btn-outline-dark btn-sm w-100">Clear editing</button>
+                                                </form>
+                                            @else
+                                                <form method="POST" action="{{ route('admin.devsell.approve', $seller) }}" class="flex-fill">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-sm w-100">Approve</button>
+                                                </form>
+                                                <form method="POST" action="{{ route('admin.devsell.reject', $seller) }}" class="flex-fill">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm w-100" onclick="return confirm('Reject this DevSell request?')">Reject</button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="alert alert-light border rounded-4 mb-5">No pending DevSell requests right now.</div>
+                @endif
+
+
                 {{-- Templates Grid --}}
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="h5 fw-bold mb-0">{{ $currentLabel }}</h2>

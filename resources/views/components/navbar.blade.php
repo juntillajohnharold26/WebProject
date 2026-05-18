@@ -108,7 +108,7 @@
                         <a class="nav-link" href="{{ url('/explore') }}">Explore</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#contact">Contact</a>
+                        <a class="nav-link" href="{{ url('/contact') }}">Contact</a>
                     </li>
                 </ul>
                 <div class="d-flex ms-auto align-items-center gap-2">

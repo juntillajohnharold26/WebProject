@@ -19,7 +19,7 @@
         <section class="admin-page py-4 py-xl-5">
             <div class="admin-page__inner mx-auto">
                 <div class="mb-4">
-                    <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-3">&larr; Back</a>
+                    <a href="{{ url('/admin') }}" class="btn btn-outline-dark btn-sm mb-3" onclick="if (window.history.length > 1) { window.history.back(); return false; }">&larr; Back</a>
                     <div class="d-flex align-items-center gap-2 mb-2">
                         <span class="small text-muted">Admin / Review Template</span>
                     </div>

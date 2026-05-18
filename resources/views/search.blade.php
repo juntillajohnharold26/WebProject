@@ -4,7 +4,7 @@
             <div class="container-fluid px-4">
                 <div class="row mb-5">
                     <div class="col-12">
-                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
+                        <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm" onclick="if (window.history.length > 1) { window.history.back(); return false; }">← Back</a>
                     </div>
                 </div>
 
@@ -38,25 +38,14 @@
                     </div>
 
                         <div class="col-lg-4">
-                            <div class="card h-100 border-0 shadow-sm rounded-4 p-4 sticky-top" style="top: 2rem;">
+                            <div class="card border-0 shadow-sm rounded-4 p-4 sticky-top search-filter-card">
                                 <h5 class="fw-bold mb-4">Filters</h5>
                                 
                                 <form method="GET" action="{{ url('/search') }}" class="mb-4">
                                     <div class="mb-3">
-                                        <label class="form-label fw-semibold small mb-2">Search</label>
-                                        <input type="text" name="q" value="{{ request('q') }}" class="form-control form-control-sm" placeholder="Title, keyword...">
+                                        <label class="form-label fw-semibold small mb-2">Seller / Shop</label>
+                                        <input type="text" name="seller" value="{{ request('seller') }}" class="form-control form-control-sm" placeholder="Seller or shop name">
                                     </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold small mb-2">Tag</label>
-                                        <select name="tag" class="form-select form-select-sm">
-                                            <option value="">All tags</option>
-                                            @foreach($tags as $tag)
-                                                <option value="{{ $tag }}" {{ request('tag') == $tag ? 'selected' : '' }}>{{ ucfirst($tag) }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold small mb-2">Category</label>
                                         <select name="category" class="form-select form-select-sm">
@@ -67,14 +56,14 @@
                                         </select>
                                     </div>
                                     
-                                    <div class="row">
+                                    <div class="row g-3 price-range-row">
                                         <div class="col-6">
-                                            <label class="form-label fw-semibold small mb-1">Min Price</label>
-                                            <input type="number" name="min_price" step="0.01" value="{{ request('min_price', $minPrice ?? 0) }}" class="form-control form-control-sm" min="0">
+                                            <label class="form-label fw-semibold small mb-2">Min Price</label>
+                                            <input type="number" name="min_price" step="0.01" value="{{ request('min_price', $minPrice ?? 0) }}" class="form-control form-control-sm price-range-input" min="0">
                                         </div>
                                         <div class="col-6">
-                                            <label class="form-label fw-semibold small mb-1">Max Price</label>
-                                            <input type="number" name="max_price" step="0.01" value="{{ request('max_price', '') }}" class="form-control form-control-sm" min="0">
+                                            <label class="form-label fw-semibold small mb-2">Max Price</label>
+                                            <input type="number" name="max_price" step="0.01" value="{{ request('max_price', '') }}" class="form-control form-control-sm price-range-input" min="0">
                                         </div>
                                     </div>
                                     
@@ -96,6 +85,57 @@
         background: radial-gradient(circle at top left, rgba(0, 0, 0, 0.08), transparent 32%),
             radial-gradient(circle at bottom right, rgba(0, 0, 0, 0.06), transparent 20%),
             #f8f9fb;
+    }
+
+    .hero-card {
+        background: linear-gradient(180deg, #ffffff 0%, #f4f6f8 100%);
+        border: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .search-hero .card {
+        border-color: rgba(15, 23, 42, 0.12);
+        background-color: #fff;
+    }
+
+    .search-filter-card {
+        top: 5.5rem;
+    }
+
+    .search-hero .form-control,
+    .search-hero .form-select {
+        border: 1px solid rgba(15, 23, 42, 0.18);
+        background-color: #fff;
+        color: #0f172a;
+        border-radius: 0.85rem;
+        padding: 0.75rem 1rem;
+        width: 100%;
+        min-height: calc(1.5em + 1rem + 2px);
+        box-sizing: border-box;
+    }
+
+    .search-hero .form-control[type="number"] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    .search-hero .form-control[type="number"]::-webkit-outer-spin-button,
+    .search-hero .form-control[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .search-hero .price-range-input {
+        max-width: 135px;
+        min-width: 110px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .search-hero .form-control:focus,
+    .search-hero .form-select:focus {
+        border-color: rgba(15, 23, 42, 0.4);
+        box-shadow: 0 0 0 0.15rem rgba(15, 23, 42, 0.12);
+        background-color: #fff;
     }
 
     .hero-card {

@@ -11,7 +11,7 @@
             <div class="edit-template__inner mx-auto">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-2">&larr; Back</a>
+                        <a href="{{ route('seller.templates.index') }}" class="btn btn-outline-dark btn-sm mb-2" onclick="if (window.history.length > 1) { window.history.back(); return false; }">&larr; Back</a>
                         <h1 class="h3 fw-bold mb-0">Edit Template</h1>
                     </div>
                 </div>

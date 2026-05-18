@@ -15,15 +15,40 @@
                     </div>
                     <h6 class="fw-bold mb-2">{{ Str::limit($listing->title, 50) }}</h6>
                     <p class="text-muted small mb-2">{{ Str::limit($listing->description, 80) }}</p>
-                    <div class="d-flex align-items-center mb-3">
+                    <a href="{{ route('sellers.show', $listing->user) }}" class="d-flex align-items-center mb-2 text-decoration-none">
                         <img src="{{ $listing->user->profile_avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($listing->user->name) }}" 
                              class="rounded-circle" style="width: 32px; height: 32px; object-fit: cover;" alt="{{ $listing->user->name }}">
                         <span class="ms-2 small text-muted">{{ $listing->user->devsell_display_name ?? $listing->user->name }}</span>
+                    </a>
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        @if($listing->reviews_count > 0)
+                            <span class="badge bg-success text-white">
+                                <i class="fa-regular fa-thumbs-up me-1"></i>
+                                {{ $listing->positive_reviews_count }}
+                            </span>
+                            <span class="badge bg-danger text-white">
+                                <i class="fa-regular fa-thumbs-down me-1"></i>
+                                {{ $listing->negative_reviews_count }}
+                            </span>
+                            <span class="small text-muted">({{ $listing->reviews_count }} reviews)</span>
+                        @else
+                            <span class="small text-muted">No reviews yet</span>
+                        @endif
                     </div>
-                    <form method="POST" action="{{ route('cart.add', $listing) }}">
-                        @csrf
-                        <button type="submit" class="btn btn-dark btn-sm w-100" style="border-radius: 8px;">Add to Cart</button>
-                    </form>
+                    @php
+                        $currentUserId = session('user_id') ? (int) session('user_id') : null;
+                        $isOwner = $currentUserId !== null && $listing->user_id === $currentUserId;
+                    @endphp
+                    @if ($isOwner)
+                        <button type="button" class="btn btn-secondary btn-sm w-100" style="border-radius: 8px;" disabled>
+                            Owned by you
+                        </button>
+                    @else
+                        <form method="POST" action="{{ route('cart.add', $listing) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-dark btn-sm w-100" style="border-radius: 8px;">Add to Cart</button>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

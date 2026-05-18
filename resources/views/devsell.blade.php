@@ -4,7 +4,7 @@
             <div class="seller-page__inner mx-auto">
                 <div class="seller-page__hero mb-4">
                     <div class="seller-page__hero-copy">
-                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-3">&larr; Back</a>
+                        <a href="{{ url('/account') }}" class="btn btn-outline-dark btn-sm mb-3" onclick="if (window.history.length > 1) { window.history.back(); return false; }">&larr; Back</a>
                         <h1 class="seller-page__title">Unlock DevSell access with your account credentials.</h1>
                         <p class="seller-page__lead mb-0">Use your DevBuy email and password, then finish your seller details to start sharing templates, UI kits, and premium digital assets.</p>
                     </div>
@@ -12,10 +12,24 @@
                     <div class="seller-page__status card border-0 shadow-sm">
                         <div class="card-body p-4">
                             <p class="text-uppercase small text-muted mb-2">Access status</p>
-                            <h2 class="h5 fw-bold mb-2">{{ $sellerAccess['active'] ? 'Seller access active' : 'Pending verification' }}</h2>
+                            <h2 class="h5 fw-bold mb-2">
+                                @if ($sellerAccess['active'])
+                                    Seller access active
+                                @elseif (($sellerAccess['status'] ?? 'none') === 'pending')
+                                    Waiting for admin approval
+                                @elseif (($sellerAccess['status'] ?? 'none') === 'rejected')
+                                    Request rejected
+                                @else
+                                    Pending verification
+                                @endif
+                            </h2>
                             <p class="text-muted mb-0">
                                 @if ($sellerAccess['active'])
                                     Activated on {{ $sellerAccess['joined_at'] }}.
+                                @elseif (($sellerAccess['status'] ?? 'none') === 'pending')
+                                    Your email is verified. An admin needs to approve your DevSell request before you can access seller tools.
+                                @elseif (($sellerAccess['status'] ?? 'none') === 'rejected')
+                                    Your previous request was rejected. You can update your details and submit again.
                                 @else
                                     Confirm your credentials below to enable your DevSell seller tools.
                                 @endif
@@ -26,6 +40,10 @@
 
                 @if (session('success'))
                     <div class="alert alert-success seller-alert border-0 shadow-sm mb-4">{{ session('success') }}</div>
+                @endif
+
+                @if (session('error'))
+                    <div class="alert alert-danger seller-alert border-0 shadow-sm mb-4">{{ session('error') }}</div>
                 @endif
 
                 <div class="row g-4 align-items-stretch">
@@ -45,15 +63,15 @@
                                 <div class="seller-benefit">
                                     <span>02</span>
                                     <div>
-                                        <h3>Seller profile</h3>
-                                        <p>Add your store name, specialty, and portfolio link so buyers know what you offer.</p>
+                                        <h3>Admin review</h3>
+                                        <p>Your request is reviewed by the DevSell team before seller tools are enabled.</p>
                                     </div>
                                 </div>
                                 <div class="seller-benefit">
                                     <span>03</span>
                                     <div>
-                                        <h3>Ready to manage</h3>
-                                        <p>Once saved, you can revisit this page anytime from the sidebar to update details.</p>
+                                        <h3>Seller profile</h3>
+                                        <p>Add your store name, specialty, and portfolio link so buyers know what you offer.</p>
                                     </div>
                                 </div>
                             </div>
@@ -82,7 +100,7 @@
                         <div class="seller-card h-100">
                             <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
                                 <div>
-                                    <p class="text-uppercase small text-muted mb-1">Credential form</p>
+<p class="text-uppercase small text-muted mb-1">Credential form</p>
                                     <h2 class="h4 fw-semibold mb-0">Join DevSell</h2>
                                 </div>
                                 <span class="small text-muted">All fields help set up your seller profile.</span>
@@ -139,10 +157,8 @@
                                 </div>
 
                                 <div class="seller-card__footer">
-                                    <p class="text-muted small mb-0">Your email and password are checked against the current DevBuy account before seller access is granted.</p>
-                                    <button type="submit" class="btn btn-dark seller-submit">
-                                        {{ $sellerAccess['active'] ? 'Update Seller Access' : 'Unlock DevSell Access' }}
-                                    </button>
+                                    <p class="text-muted small mb-0">Your email and password are checked first, then your request is submitted for admin review.</p>
+                                    <button type="submit" class="btn btn-dark seller-submit">{{ $sellerAccess['active'] ? 'Update Seller Access' : 'Submit for Review' }}</button>
                                 </div>
                             </form>
                         </div>
@@ -347,6 +363,13 @@
         padding: 1rem 1.15rem;
     }
 
+    .seller-verification {
+        border-radius: 1.25rem;
+        background: #f8fafc;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        padding: 1.25rem;
+    }
+
     .seller-input {
         border-radius: 1rem;
         border: 1px solid rgba(15, 23, 42, 0.12);
@@ -379,6 +402,14 @@
         resize: vertical;
     }
 
+    .seller-code-input {
+        max-width: 260px;
+        letter-spacing: 0.35rem;
+        font-size: 1.35rem;
+        font-weight: 700;
+        text-align: center;
+    }
+
     .seller-input:-webkit-autofill,
     .seller-input:-webkit-autofill:hover,
     .seller-input:-webkit-autofill:focus {
@@ -404,6 +435,13 @@
         padding: 0.95rem 1.25rem;
         font-weight: 600;
         font-size: 1rem;
+    }
+
+    .seller-resend {
+        width: 100%;
+        border-radius: 1rem;
+        padding: 0.85rem 1.25rem;
+        font-weight: 600;
     }
 
     .seller-card form .row {

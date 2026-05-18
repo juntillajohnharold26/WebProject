@@ -4,7 +4,7 @@
             <div class="container-fluid px-4">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
+                        <a href="{{ url('/inbox') }}" class="btn btn-outline-dark btn-sm" onclick="if (window.history.length > 1) { window.history.back(); return false; }">← Back</a>
                     </div>
                 </div>
 
@@ -21,6 +21,14 @@
                         <p class="text-muted mb-0">{{ $message['body'] }}</p>
                     </div>
                     <div class="d-flex gap-2">
+                        <form method="POST" action="{{ route('messages.toggle-read', $message['id']) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Mark Unread</button>
+                        </form>
+                        <form method="POST" action="{{ route('messages.delete', $message['id']) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                        </form>
                         <a href="{{ url('/contact') }}" class="btn btn-dark btn-sm">Contact Support</a>
                     </div>
                 </div>

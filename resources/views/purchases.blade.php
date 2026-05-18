@@ -4,16 +4,13 @@
             <div class="container-fluid px-4">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
+                        <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm" onclick="if (window.history.length > 1) { window.history.back(); return false; }">← Back</a>
                     </div>
                 </div>
                 <div class="row align-items-center mb-4">
                     <div class="col-lg-8">
                         <h1 class="display-6 fw-bold">Your purchased assets and services.</h1>
                         <p class="text-muted">Keep track of your latest purchases, downloads, and active subscriptions in one polished place.</p>
-                    </div>
-                    <div class="col-lg-4 text-lg-end">
-                        <a href="#" class="btn btn-outline-dark">View invoices</a>
                     </div>
                 </div>
 
@@ -31,7 +28,17 @@
                                         <h5 class="card-title mb-1">{{ $purchase['title'] }}</h5>
                                         <p class="text-muted small mb-0">{{ $purchase['category'] }} by {{ $purchase['seller'] }}</p>
                                     </div>
-                                    <span class="badge bg-success">{{ $purchase['status'] }}</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge {{ $purchase['payment_status'] === 'Paid' ? 'bg-success' : 'bg-warning text-dark' }}">
+                                            {{ $purchase['payment_status'] }}
+                                        </span>
+                                        @if(($purchase['payment_status'] ?? $purchase['status'] ?? '') === 'Paid' && ! empty($purchase['listing_id']))
+                                            @php $listing = \App\Models\TemplateListing::find($purchase['listing_id']); @endphp
+                                            @if($listing && $listing->zip_path)
+                                                <a href="{{ route('purchases.download', $purchase['id']) }}" class="btn btn-sm btn-outline-dark">Download</a>
+                                            @endif
+                                        @endif
+                                    </div>
                                 </div>
                                 <div class="row g-3 text-muted small">
                                     <div class="col-6">Purchased</div>
@@ -40,8 +47,13 @@
                                     <div class="col-6 text-end">{{ $purchase['quantity'] }}</div>
                                     <div class="col-6">Amount</div>
                                     <div class="col-6 text-end">${{ number_format($purchase['total'], 2) }}</div>
-                                    <div class="col-6">License</div>
-                                    <div class="col-6 text-end">Commercial</div>
+                                    <div class="col-6">Payment Method</div>
+                                    <div class="col-6 text-end">{{ $purchase['payment_method'] ?? 'Credit Card' }}</div>
+                                    <div class="col-6">Transaction ID</div>
+                                    <div class="col-6 text-end text-truncate" style="max-width: 160px;">{{ $purchase['transaction_id'] ?? 'N/A' }}</div>
+                                </div>
+                                <div class="mt-3 text-muted small">
+                                    <span class="badge {{ ($purchase['order_status'] ?? 'Delivered') === 'Delivered' ? 'bg-success' : 'bg-warning text-dark' }}">{{ $purchase['order_status'] ?? 'Delivered' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -83,9 +95,9 @@
                                         @forelse($purchases as $purchase)
                                             <tr>
                                                 <td>{{ $purchase['title'] }}</td>
-                                                <td><span class="badge bg-success">Delivered</span></td>
-                                                <td>{{ \Carbon\Carbon::parse($purchase['purchased_at'])->format('M j, Y') }}</td>
-                                                <td class="text-end">${{ number_format($purchase['total'], 2) }}</td>
+                                                <td><span class="badge {{ ($purchase['order_status'] ?? 'Delivered') === 'Delivered' ? 'bg-success' : 'bg-warning text-dark' }}">{{ $purchase['order_status'] ?? 'Delivered' }}</span></td>
+                                                <td>{{ \Carbon\Carbon::parse($purchase['purchased_at'] ?? now()->toDateTimeString())->format('M j, Y') }}</td>
+                                                <td class="text-end">${{ number_format($purchase['total'] ?? 0, 2) }}</td>
                                             </tr>
                                         @empty
                                             <tr>

@@ -8,7 +8,7 @@
     <x-sidebar>
         <section class="create-template-page py-4">
             <div class="create-template__inner mx-auto">
-                <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm mb-4">&larr; Back</a>
+                <a href="{{ route('seller.templates.index') }}" class="btn btn-outline-dark btn-sm mb-4" onclick="if (window.history.length > 1) { window.history.back(); return false; }">&larr; Back</a>
                 <h1 class="h2 fw-bold mb-4">Create New Template</h1>
 
                 @if ($errors->any())

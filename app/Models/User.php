@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -28,6 +29,7 @@ class User extends Authenticatable
         'profile_avatar',
         'profile_status',
         'devsell_active',
+        'devsell_status',
         'devsell_joined_at',
         'devsell_display_name',
         'devsell_store_name',
@@ -59,8 +61,29 @@ class User extends Authenticatable
             'password' => 'hashed',
             'profile_status' => 'string',
             'devsell_active' => 'boolean',
+            'devsell_status' => 'string',
             'devsell_joined_at' => 'datetime',
             'is_admin' => 'boolean',
         ];
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function templateListings(): HasMany
+    {
+        return $this->hasMany(TemplateListing::class);
+    }
+
+    public function marketplaceNotifications(): HasMany
+    {
+        return $this->hasMany(MarketplaceNotification::class);
     }
 }

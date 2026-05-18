@@ -7,6 +7,7 @@
     <title>DevBuy</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         body {
             background-color: #f4f5f8;
@@ -81,6 +82,7 @@
 <body>
     @php
         $isAdminArea = request()->is('admin*');
+        $menuUser = session('user_id') ? \App\Models\User::find(session('user_id')) : null;
     @endphp
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow-sm">
         <div class="container-fluid">
@@ -100,9 +102,32 @@
                 @php
                     $navNotifications = session('notifications', []);
                     $navMessages = session('messages', []);
+                    if ($menuUser) {
+                        $savedNotifications = $menuUser->marketplaceNotifications()
+                            ->latest()
+                            ->take(5)
+                            ->get()
+                            ->map(fn ($notification) => [
+                                'title' => $notification->title,
+                                'body' => $notification->body,
+                                'badge' => $notification->badge,
+                                'badge_class' => $notification->badge_class,
+                                'time' => $notification->created_at->diffForHumans(),
+                            ])
+                            ->all();
+                        $navNotifications = array_values(array_merge($savedNotifications, $navNotifications));
+                    }
                 @endphp
                 <button class="btn btn-outline-light btn-sm" title="Notifications" data-bs-toggle="modal" data-bs-target="#notificationsModal">🔔</button>
-                <a href="{{ url('/inbox') }}" class="btn btn-outline-light btn-sm" title="Inbox">✉️</a>
+                @php
+                    $navMessages = session('messages', []);
+                    $unreadCount = collect($navMessages)->filter(fn($m) => empty($m['read']))->count();
+                @endphp
+                <a href="{{ url('/inbox') }}" class="btn btn-outline-light btn-sm position-relative" title="Inbox">✉️
+                    @if($unreadCount > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">{{ $unreadCount }}</span>
+                    @endif
+                </a>
                 <a href="{{ url('/cart') }}" class="btn btn-outline-light btn-sm position-relative" title="Cart">
                     🛒
                     @php
@@ -117,7 +142,6 @@
                 @endunless
                 <div class="dropdown">
                     @php
-                        $menuUser = session('user_id') ? \App\Models\User::find(session('user_id')) : null;
                         $avatarUrl = $menuUser?->profile_avatar ?: 'https://static.vecteezy.com/system/resources/previews/046/010/545/non_2x/user-icon-simple-design-free-vector.jpg';
                     @endphp
                     <button class="btn btn-outline-light btn-sm dropdown-toggle d-flex align-items-center p-0" type="button" id="profileMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -131,9 +155,8 @@
                             <li><a class="dropdown-item text-warning" href="{{ url('/admin') }}">Admin Dashboard</a></li>
                         @endif
                         @unless($isAdminArea)
-                        <li><a class="dropdown-item text-white" href="#">Switch Account</a></li>
+                        <li><a class="dropdown-item text-white" href="{{ route('switch-account') }}">Switch Account</a></li>
 
-                        <li><a class="dropdown-item text-white" href="#">Settings</a></li>
                         @endunless
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item text-danger" href="#" onclick="event.preventDefault(); document.getElementById('logoutMenuForm').submit();">Logout</a></li>
@@ -157,19 +180,20 @@
                 </div>
                 <div class="modal-body">
                     <div class="list-group mb-3">
-                        @forelse(session('messages', []) as $message)
-                            <a href="{{ url('/messages/' . $message['id']) }}" class="list-group-item list-group-item-action rounded-4 mb-3">
+                        @forelse($navNotifications as $notification)
+                            <div class="list-group-item rounded-4 mb-3">
                                 <div class="d-flex justify-content-between align-items-start">
                                     <div>
-                                        <h6 class="mb-1">{{ $message['subject'] }}</h6>
-                                        <p class="mb-1 text-muted small">{{ $message['preview'] ?? $message['body'] }}</p>
+                                        <h6 class="mb-1">{{ $notification['title'] }}</h6>
+                                        <p class="mb-1 text-muted small">{{ $notification['body'] }}</p>
                                     </div>
-                                    <small class="text-muted">{{ $message['time'] ?? 'Just now' }}</small>
+                                    <span class="badge {{ $notification['badge_class'] ?? 'bg-primary' }}">{{ $notification['badge'] ?? 'Update' }}</span>
                                 </div>
-                            </a>
+                                <small class="text-muted">{{ $notification['time'] ?? 'Just now' }}</small>
+                            </div>
                         @empty
                             <div class="list-group-item rounded-4 text-center py-4">
-                                <p class="text-muted small mb-0">Purchase notifications will appear here.</p>
+                                <p class="text-muted small mb-0">Marketplace notifications will appear here.</p>
                             </div>
                         @endforelse
                     </div>

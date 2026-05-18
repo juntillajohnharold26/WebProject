@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TemplateListing extends Model
 {
@@ -32,6 +33,64 @@ class TemplateListing extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(Like::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function isLikedBy(?int $userId): bool
+    {
+        if (! $userId) {
+            return false;
+        }
+
+        return $this->likes()->where('user_id', $userId)->exists();
+    }
+
+    public function getAverageRating(): float
+    {
+        return $this->reviews()->avg('rating') ?? 0;
+    }
+
+    public function getReviewCount(): int
+    {
+        return $this->reviews()->count();
+    }
+
+    public function thumbsUpCount(): int
+    {
+        if ($this->relationLoaded('reviews')) {
+            return $this->reviews->where('rating', '>=', 4)->count();
+        }
+
+        return $this->reviews()->where('rating', '>=', 4)->count();
+    }
+
+    public function thumbsDownCount(): int
+    {
+        if ($this->relationLoaded('reviews')) {
+            return $this->reviews->where('rating', '<', 4)->count();
+        }
+
+        return $this->reviews()->where('rating', '<', 4)->count();
+    }
+
+    public function thumbsUpPercentage(): int
+    {
+        $total = $this->getReviewCount();
+
+        if ($total === 0) {
+            return 0;
+        }
+
+        return (int) round(($this->thumbsUpCount() / $total) * 100);
     }
 
     public function scopePending($query)

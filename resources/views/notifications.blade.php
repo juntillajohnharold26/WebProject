@@ -4,7 +4,7 @@
             <div class="container-fluid px-4">
                 <div class="row mb-4">
                     <div class="col-12">
-                        <a href="{{ url()->previous() }}" class="btn btn-outline-dark btn-sm">← Back</a>
+                        <a href="{{ url('/explore') }}" class="btn btn-outline-dark btn-sm" onclick="if (window.history.length > 1) { window.history.back(); return false; }">← Back</a>
                     </div>
                 </div>
 
